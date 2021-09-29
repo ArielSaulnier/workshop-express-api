@@ -142,7 +142,7 @@ exports.deleteAll = (req, res) => {
         });
 };
 
-// Find all published users
+// Find all locked users
 exports.findAllLocked = (req, res) => {
     User.find({
             locked: true
