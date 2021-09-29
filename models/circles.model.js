@@ -5,7 +5,7 @@ module.exports = mongoose => {
             members: [String],
             messages:[{author: String,content: String, posted_at: String, seenby: [String]}],
             owner: String,
-            setting: {msgDeletionTime: String, color: String},
+            settings: {msgDeletionTime: Number, color: String},
             isDirect: Boolean
         }, {
             timestamps: true

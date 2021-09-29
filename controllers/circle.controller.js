@@ -1,7 +1,7 @@
 const db = require("../models");
-const User = db.users;
+const Circle = db.circles;
 
-// Create and Save a new user
+// Create and Save a new circle
 exports.create = (req, res) => {
     // Validate request
     if (!req.body.fname) {
@@ -11,31 +11,34 @@ exports.create = (req, res) => {
         return;
     }
 
-    // Create a user
-    const user = new User({
-        fname: req.body.fname,
-        lname: req.body.lname,
-        locked: req.body.locked,
-        lastpassdate: req.body.lastpassdate,
-        contacts: [],
-        password: req.body.password
+    // Create a circle
+    const circle = new Circle({
+        name: req.body.name,
+        members: req.body.members,
+        messages: [],
+        owner: req.body.owner,
+        settings: {
+            msgDeletionTime: null,
+            color: "#434343"
+        },
+        isDirect: req.body.isDirect
     });
 
-    // Save user in the database
-    user
-        .save(user)
+    // Save circle in the database
+    circle
+        .save(circle)
         .then(data => {
             res.send(data);
         }).catch(err => {
             res.status(500).send({
-                message: err.message || "Some error occurred while creating the user."
+                message: err.message || "Some error occurred while creating the circle."
             });
         });
 };
 
-// Retrieve all users from the database.
+// Retrieve all circles from the database.
 exports.findAll = (req, res) => {
-    const fname = req.query.fname;
+    const name = req.query.fname;
     var condition = fname ? {
         fname: {
             $regex: new RegExp(fname),
@@ -43,26 +46,26 @@ exports.findAll = (req, res) => {
         }
     } : {};
 
-    User.find(condition)
+    Circle.find(condition)
         .then(data => {
             res.send(data);
         })
         .catch(err => {
             res.status(500).send({
-                message: err.message || "Some error occurred while retrieving users."
+                message: err.message || "Some error occurred while retrieving circles."
             });
         });
 };
 
-// Find a single user with an id
+// Find a single circle with an id
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
-    User.findById(id)
+    Circle.findById(id)
         .then(data => {
             if (!data)
                 res.status(404).send({
-                    message: "Not found user with id " + id
+                    message: "Not found circle with id " + id
                 });
             else res.send(data);
         })
@@ -70,12 +73,12 @@ exports.findOne = (req, res) => {
             res
                 .status(500)
                 .send({
-                    message: "Error retrieving user with id=" + id
+                    message: "Error retrieving circle with id=" + id
                 });
         });
 };
 
-// Update a user by the id in the request
+// Update a circle by the id in the request
 exports.update = (req, res) => {
     if (!req.body) {
         return res.status(400).send({
@@ -85,66 +88,66 @@ exports.update = (req, res) => {
 
     const id = req.params.id;
 
-    User.findByIdAndUpdate(id, req.body, {
+    Circle.findByIdAndUpdate(id, req.body, {
             useFindAndModify: false
         })
         .then(data => {
             if (!data) {
                 res.status(404).send({
-                    message: `Cannot update user with id=${id}. Maybe user was not found!`
+                    message: `Cannot update circle with id=${id}. Maybe circle was not found!`
                 });
             } else res.send({
-                message: "user was updated successfully."
+                message: "circle was updated successfully."
             });
         })
         .catch(err => {
             res.status(500).send({
-                message: "Error updating user with id=" + id
+                message: "Error updating circle with id=" + id
             });
         });
 };
 
-// Delete a user with the specified id in the request
+// Delete a circle with the specified id in the request
 exports.delete = (req, res) => {
     const id = req.params.id;
 
-    User.findByIdAndRemove(id)
+    Circle.findByIdAndRemove(id)
         .then(data => {
             if (!data) {
                 res.status(404).send({
-                    message: `Cannot delete user with id=${id}. Maybe user was not found!`
+                    message: `Cannot delete circle with id=${id}. Maybe circle was not found!`
                 });
             } else {
                 res.send({
-                    message: "user was deleted successfully!"
+                    message: "circle was deleted successfully!"
                 });
             }
         })
         .catch(err => {
             res.status(500).send({
-                message: "Could not delete user with id=" + id
+                message: "Could not delete circle with id=" + id
             });
         });
 };
 
-// Delete all users from the database.
+// Delete all circles from the database.
 exports.deleteAll = (req, res) => {
-    User.deleteMany({})
+    Circle.deleteMany({})
         .then(data => {
             res.send({
-                message: `${data.deletedCount} users were deleted successfully!`
+                message: `${data.deletedCount} circles were deleted successfully!`
             });
         })
         .catch(err => {
             res.status(500).send({
-                message: err.message || "Some error occurred while removing all users."
+                message: err.message || "Some error occurred while removing all circles."
             });
         });
 };
 
-// Find all published users
+// Find all published circles
 exports.findAllLocked = (req, res) => {
-    User.find({
+    Circle.find({
             locked: true
         })
         .then(data => {
@@ -152,7 +155,7 @@ exports.findAllLocked = (req, res) => {
         })
         .catch(err => {
             res.status(500).send({
-                message: err.message || "Some error occurred while retrieving users."
+                message: err.message || "Some error occurred while retrieving circles."
             });
         });
 };
